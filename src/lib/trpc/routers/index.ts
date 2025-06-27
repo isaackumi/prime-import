@@ -24,20 +24,34 @@ const storesRouter = router({
     getBySlug: publicProcedure
         .input(z.object({ slug: z.string() }))
         .query(async ({ input }) => {
+            console.log('Stores getBySlug called with:', input.slug)
             const payload = await getPayload({ config: configPromise })
-            const store = await payload.find({
-                collection: 'stores',
-                where: {
-                    slug: {
-                        equals: input.slug,
+
+            try {
+                const store = await payload.find({
+                    collection: 'stores',
+                    where: {
+                        slug: {
+                            equals: input.slug,
+                        },
+                        isActive: {
+                            equals: true,
+                        },
                     },
-                    isActive: {
-                        equals: true,
-                    },
-                },
-                limit: 1,
-            })
-            return store.docs[0] || null
+                    limit: 1,
+                })
+
+                console.log('Store query result:', {
+                    found: store.docs.length > 0,
+                    totalDocs: store.totalDocs,
+                    slug: input.slug
+                })
+
+                return store.docs[0] || null
+            } catch (error) {
+                console.error('Error in stores getBySlug:', error)
+                throw error
+            }
         }),
 
     create: protectedProcedure

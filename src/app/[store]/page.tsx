@@ -26,17 +26,43 @@ export default function StorePage() {
     useEffect(() => {
         // Extract subdomain from hostname
         const hostname = window.location.hostname
+        const pathname = window.location.pathname
+
+        // Try to get store slug from subdomain first
+        let slug = ''
         const subdomain = hostname.split('.')[0]
 
         if (hostname.includes('.') && subdomain !== 'www' && subdomain !== 'localhost') {
-            setStoreSlug(subdomain)
+            slug = subdomain
+        } else {
+            // If no subdomain, try to extract from pathname (for middleware rewrites)
+            const pathSegments = pathname.split('/').filter(Boolean)
+            if (pathSegments.length > 0) {
+                slug = pathSegments[0]
+            }
         }
+
+        console.log('Store detection:', { hostname, pathname, subdomain, slug })
+        setStoreSlug(slug)
     }, [])
 
-    const { data: store, isLoading: storeLoading } = trpc.stores.getBySlug.useQuery(
+    const { data: store, isLoading: storeLoading, error } = trpc.stores.getBySlug.useQuery(
         { slug: storeSlug },
         { enabled: !!storeSlug }
     )
+
+    // Log for debugging
+    useEffect(() => {
+        if (storeSlug) {
+            console.log('Looking for store with slug:', storeSlug)
+        }
+        if (error) {
+            console.error('Store query error:', error)
+        }
+        if (store) {
+            console.log('Store found:', store)
+        }
+    }, [storeSlug, store, error])
 
     const handleCategorySelect = (categorySlug: string) => {
         // Category selection is handled by the sidebar component
@@ -76,7 +102,26 @@ export default function StorePage() {
                     <div className="text-center">
                         <div className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-red-50 p-8 max-w-md mx-auto">
                             <h3 className="text-xl font-bold text-red-600 mb-2">Store Not Found</h3>
-                            <p className="text-red-500">The store you are looking for does not exist.</p>
+                            <p className="text-red-500 mb-4">The store you are looking for does not exist.</p>
+                            {storeSlug && (
+                                <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded border">
+                                    <p><strong>Debug Info:</strong></p>
+                                    <p>Store Slug: {storeSlug}</p>
+                                    <p>Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
+                                    <p>Pathname: {typeof window !== 'undefined' ? window.location.pathname : 'N/A'}</p>
+                                    {error && (
+                                        <p className="text-red-500 mt-2">Error: {error.message}</p>
+                                    )}
+                                </div>
+                            )}
+                            <div className="mt-4">
+                                <a
+                                    href="/"
+                                    className="text-blue-600 hover:text-blue-800 font-bold"
+                                >
+                                    ← Back to Home
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -139,6 +139,48 @@ const categories = [
     },
 ]
 
+const sampleStores = [
+    {
+        name: "Tech Gadgets Store",
+        slug: "tech-gadgets",
+        description: "Your one-stop shop for the latest tech gadgets and electronics",
+        theme: {
+            primaryColor: "#2563eb",
+            secondaryColor: "#1e40af"
+        },
+        isActive: true
+    },
+    {
+        name: "Fashion Boutique",
+        slug: "fashion-boutique",
+        description: "Trendy fashion items for the modern lifestyle",
+        theme: {
+            primaryColor: "#ec4899",
+            secondaryColor: "#be185d"
+        },
+        isActive: true
+    },
+    {
+        name: "Home & Garden",
+        slug: "home-garden",
+        description: "Everything you need to make your home beautiful",
+        theme: {
+            primaryColor: "#059669",
+            secondaryColor: "#047857"
+        },
+        isActive: true
+    },
+    {
+        name: "Sports Equipment",
+        slug: "sports-equipment",
+        description: "Quality sports equipment for all your athletic needs",
+        theme: {
+            primaryColor: "#dc2626",
+            secondaryColor: "#b91c1c"
+        },
+        isActive: true
+    }
+]
 
 const seed = async () => {
     console.log('🌱 Starting database seeding...');
@@ -198,6 +240,134 @@ const seed = async () => {
         console.log(`   - Categories created: ${createdCategories}`);
         console.log(`   - Subcategories created: ${createdSubcategories}`);
         console.log(`   - Total items created: ${createdCategories + createdSubcategories}`);
+
+        // Create sample stores
+        console.log('\n🏪 Creating sample stores...');
+        let createdStores = 0;
+
+        for (const store of sampleStores) {
+            try {
+                console.log(`📝 Creating store: ${store.name}`);
+
+                await payload.create({
+                    collection: "stores" as any,
+                    data: {
+                        name: store.name,
+                        slug: store.slug,
+                        description: store.description,
+                        theme: store.theme,
+                        isActive: store.isActive,
+                        owner: 'demo-owner', // Placeholder owner
+                    }
+                });
+
+                console.log(`✅ Created store: ${store.name} (slug: ${store.slug})`);
+                createdStores++;
+            } catch (storeError) {
+                console.error(`❌ Failed to create store: ${store.name}`, storeError);
+            }
+        }
+
+        console.log('\n🎉 Store seeding completed!');
+        console.log(`📊 Store Summary:`);
+        console.log(`   - Stores created: ${createdStores}`);
+        console.log(`   - Available store slugs: ${sampleStores.map(s => s.slug).join(', ')}`);
+        console.log('\n🌐 You can now test subdomain access with:');
+        sampleStores.forEach(store => {
+            console.log(`   - ${store.slug}.yourdomain.com`);
+        });
+
+        // Create sample products for each store
+        console.log('\n📦 Creating sample products...');
+        let createdProducts = 0;
+
+        const sampleProducts = [
+            {
+                name: "Wireless Bluetooth Headphones",
+                slug: "wireless-bluetooth-headphones",
+                price: 89.99,
+                description: "High-quality wireless headphones with noise cancellation",
+                storeSlug: "tech-gadgets"
+            },
+            {
+                name: "Smartphone Case",
+                slug: "smartphone-case",
+                price: 24.99,
+                description: "Durable protective case for your smartphone",
+                storeSlug: "tech-gadgets"
+            },
+            {
+                name: "Summer Dress",
+                slug: "summer-dress",
+                price: 45.99,
+                description: "Elegant summer dress perfect for any occasion",
+                storeSlug: "fashion-boutique"
+            },
+            {
+                name: "Leather Handbag",
+                slug: "leather-handbag",
+                price: 129.99,
+                description: "Premium leather handbag with multiple compartments",
+                storeSlug: "fashion-boutique"
+            },
+            {
+                name: "Garden Planter Set",
+                slug: "garden-planter-set",
+                price: 34.99,
+                description: "Beautiful ceramic planters for your garden",
+                storeSlug: "home-garden"
+            },
+            {
+                name: "Yoga Mat",
+                slug: "yoga-mat",
+                price: 29.99,
+                description: "Non-slip yoga mat for your fitness routine",
+                storeSlug: "sports-equipment"
+            }
+        ];
+
+        for (const product of sampleProducts) {
+            try {
+                console.log(`📝 Creating product: ${product.name}`);
+
+                // Find the store by slug
+                const store = await payload.find({
+                    collection: "stores",
+                    where: {
+                        slug: {
+                            equals: product.storeSlug,
+                        },
+                    },
+                    limit: 1,
+                });
+
+                if (store.docs.length === 0) {
+                    console.error(`❌ Store not found for product: ${product.name}`);
+                    continue;
+                }
+
+                await payload.create({
+                    collection: "products" as any,
+                    data: {
+                        name: product.name,
+                        slug: product.slug,
+                        price: product.price,
+                        description: product.description,
+                        store: store.docs[0].id,
+                        isActive: true,
+                    }
+                });
+
+                console.log(`✅ Created product: ${product.name} for store: ${product.storeSlug}`);
+                createdProducts++;
+            } catch (productError) {
+                console.error(`❌ Failed to create product: ${product.name}`, productError);
+            }
+        }
+
+        console.log('\n🎉 Product seeding completed!');
+        console.log(`📊 Product Summary:`);
+        console.log(`   - Products created: ${createdProducts}`);
 
     } catch (error) {
         console.error('💥 Seeding failed with error:', error);
