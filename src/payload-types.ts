@@ -70,6 +70,10 @@ export interface Config {
     users: User;
     media: Media;
     categories: Category;
+    stores: Store;
+    products: Product;
+    orders: Order;
+    'platform-settings': PlatformSetting;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -83,6 +87,10 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    stores: StoresSelect<false> | StoresSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'platform-settings': PlatformSettingsSelect<false> | PlatformSettingsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -126,6 +134,22 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   username: string;
+  role: 'super_admin' | 'store_owner' | 'customer';
+  permissions?:
+    | {
+        resource?: ('all' | 'stores' | 'products' | 'orders' | 'users' | 'categories') | null;
+        actions?: ('read' | 'write' | 'delete' | 'admin')[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  assignedStores?: (string | Store)[] | null;
+  profile?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    avatar?: (string | null) | Media;
+    phone?: string | null;
+    address?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -136,6 +160,33 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stores".
+ */
+export interface Store {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  logo?: (string | null) | Media;
+  banner?: (string | null) | Media;
+  owner: string | User;
+  stripeAccountId?: string | null;
+  isActive?: boolean | null;
+  theme?: {
+    primaryColor?: string | null;
+    secondaryColor?: string | null;
+    accentColor?: string | null;
+  };
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -176,6 +227,126 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  store: string | Store;
+  images?:
+    | {
+        image: string | Media;
+        id?: string | null;
+      }[]
+    | null;
+  price: number;
+  compareAtPrice?: number | null;
+  costPerItem?: number | null;
+  sku?: string | null;
+  barcode?: string | null;
+  trackQuantity?: boolean | null;
+  quantity?: number | null;
+  categories?: (string | Category)[] | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  weight?: number | null;
+  weightUnit?: ('g' | 'kg' | 'oz' | 'lb') | null;
+  isActive?: boolean | null;
+  isFeatured?: boolean | null;
+  stripeProductId?: string | null;
+  stripePriceId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customer: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+  };
+  shippingAddress: {
+    address1: string;
+    address2?: string | null;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  items?:
+    | {
+        product: string | Product;
+        quantity: number;
+        price: number;
+        total: number;
+        id?: string | null;
+      }[]
+    | null;
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  stripePaymentIntentId?: string | null;
+  stripeSessionId?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "platform-settings".
+ */
+export interface PlatformSetting {
+  id: string;
+  name: string;
+  /**
+   * Percentage fee charged on all transactions (0-100)
+   */
+  platformFeePercentage: number;
+  /**
+   * Minimum amount required for payout to store owners
+   */
+  minimumPayoutAmount: number;
+  payoutSchedule: 'daily' | 'weekly' | 'monthly';
+  currency: 'usd' | 'eur' | 'gbp' | 'cad';
+  /**
+   * Default tax rate percentage (0-100)
+   */
+  taxRate: number;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -192,6 +363,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'stores';
+        value: string | Store;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'platform-settings';
+        value: string | PlatformSetting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -241,6 +428,24 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   username?: T;
+  role?: T;
+  permissions?:
+    | T
+    | {
+        resource?: T;
+        actions?: T;
+        id?: T;
+      };
+  assignedStores?: T;
+  profile?:
+    | T
+    | {
+        firstName?: T;
+        lastName?: T;
+        avatar?: T;
+        phone?: T;
+        address?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -279,6 +484,134 @@ export interface CategoriesSelect<T extends boolean = true> {
   color?: T;
   parent?: T;
   subcategories?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stores_select".
+ */
+export interface StoresSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  logo?: T;
+  banner?: T;
+  owner?: T;
+  stripeAccountId?: T;
+  isActive?: T;
+  theme?:
+    | T
+    | {
+        primaryColor?: T;
+        secondaryColor?: T;
+        accentColor?: T;
+      };
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  store?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  price?: T;
+  compareAtPrice?: T;
+  costPerItem?: T;
+  sku?: T;
+  barcode?: T;
+  trackQuantity?: T;
+  quantity?: T;
+  categories?: T;
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  weight?: T;
+  weightUnit?: T;
+  isActive?: T;
+  isFeatured?: T;
+  stripeProductId?: T;
+  stripePriceId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  customer?:
+    | T
+    | {
+        email?: T;
+        firstName?: T;
+        lastName?: T;
+        phone?: T;
+      };
+  shippingAddress?:
+    | T
+    | {
+        address1?: T;
+        address2?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        country?: T;
+      };
+  items?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        price?: T;
+        total?: T;
+        id?: T;
+      };
+  subtotal?: T;
+  tax?: T;
+  shipping?: T;
+  total?: T;
+  status?: T;
+  paymentStatus?: T;
+  stripePaymentIntentId?: T;
+  stripeSessionId?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "platform-settings_select".
+ */
+export interface PlatformSettingsSelect<T extends boolean = true> {
+  name?: T;
+  platformFeePercentage?: T;
+  minimumPayoutAmount?: T;
+  payoutSchedule?: T;
+  currency?: T;
+  taxRate?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
