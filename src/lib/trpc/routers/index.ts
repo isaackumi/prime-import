@@ -24,7 +24,6 @@ const storesRouter = router({
     getBySlug: publicProcedure
         .input(z.object({ slug: z.string() }))
         .query(async ({ input }) => {
-            console.log('Stores getBySlug called with:', input.slug)
             const payload = await getPayload({ config: configPromise })
 
             try {
@@ -39,12 +38,6 @@ const storesRouter = router({
                         },
                     },
                     limit: 1,
-                })
-
-                console.log('Store query result:', {
-                    found: store.docs.length > 0,
-                    totalDocs: store.totalDocs,
-                    slug: input.slug
                 })
 
                 return store.docs[0] || null
