@@ -118,6 +118,14 @@ const sampleProducts = [
 ];
 
 export async function POST() {
+    return await seedDatabase();
+}
+
+export async function GET() {
+    return await seedDatabase();
+}
+
+async function seedDatabase() {
     try {
         console.log('🌱 Starting database seeding via API...');
 
