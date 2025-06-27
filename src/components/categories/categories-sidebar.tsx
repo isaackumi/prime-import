@@ -29,7 +29,8 @@ export function CategoriesSidebar({ onCategorySelect }: CategoriesSidebarProps) 
     const handleCategoryClick = (categorySlug: string) => {
         const params = new URLSearchParams(searchParams)
         params.set('category', categorySlug)
-        router.push(`/?${params.toString()}`)
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?${params.toString()}`)
         onCategorySelect?.(categorySlug)
         setIsOpen(false)
     }
@@ -37,7 +38,8 @@ export function CategoriesSidebar({ onCategorySelect }: CategoriesSidebarProps) 
     const handleSubcategoryClick = (subcategorySlug: string) => {
         const params = new URLSearchParams(searchParams)
         params.set('category', subcategorySlug)
-        router.push(`/?${params.toString()}`)
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?${params.toString()}`)
         onCategorySelect?.(subcategorySlug)
         setIsOpen(false)
     }
@@ -45,7 +47,8 @@ export function CategoriesSidebar({ onCategorySelect }: CategoriesSidebarProps) 
     const clearCategory = () => {
         const params = new URLSearchParams(searchParams)
         params.delete('category')
-        router.push(`/?${params.toString()}`)
+        const currentPath = window.location.pathname
+        router.push(`${currentPath}?${params.toString()}`)
         onCategorySelect?.('')
         setIsOpen(false)
     }

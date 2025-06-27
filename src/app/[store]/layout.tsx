@@ -2,13 +2,23 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { TRPCProvider } from '@/lib/trpc/provider'
+import { CartProvider } from '@/contexts/cart-context'
+import { Toaster } from 'sonner'
 
 interface StoreLayoutProps {
     children: React.ReactNode
 }
 
 export default function StoreLayout({ children }: StoreLayoutProps) {
-    return <>{children}</>
+    return (
+        <TRPCProvider>
+            <CartProvider>
+                {children}
+                <Toaster position="top-right" />
+            </CartProvider>
+        </TRPCProvider>
+    )
 }
 
 function StoreHeader({ store }: { store: any }) {

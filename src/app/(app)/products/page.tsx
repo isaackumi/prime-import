@@ -13,6 +13,14 @@ function ProductsContent() {
     const searchParams = useSearchParams()
     const isMobile = useIsMobile()
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const category = searchParams.get('category')
+
+    const handleCategorySelect = (categorySlug: string) => {
+        // Category selection is handled by the sidebar component
+        if (isMobile) {
+            setIsSidebarOpen(false)
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 py-12">
@@ -48,7 +56,7 @@ function ProductsContent() {
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="p-4">
-                                    <CategoriesSidebar />
+                                    <CategoriesSidebar onCategorySelect={handleCategorySelect} />
                                 </div>
                             </SheetContent>
                         </Sheet>
@@ -59,13 +67,13 @@ function ProductsContent() {
                     {/* Desktop Sidebar */}
                     {!isMobile && (
                         <div className="lg:col-span-1">
-                            <CategoriesSidebar />
+                            <CategoriesSidebar onCategorySelect={handleCategorySelect} />
                         </div>
                     )}
 
                     {/* Products Grid */}
                     <div className="lg:col-span-3">
-                        <ProductsGrid />
+                        <ProductsGrid category={category || undefined} />
                     </div>
                 </div>
             </div>

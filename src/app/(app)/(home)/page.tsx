@@ -27,14 +27,15 @@ import { useIsMobile } from '@/hooks/use-mobile'
 
 function HomeContent() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
   const searchParams = useSearchParams()
-  const category = searchParams.get('category')
   const isMobile = useIsMobile()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const category = searchParams.get('category')
 
   const handleCategorySelect = (categorySlug: string) => {
-    setSelectedCategory(categorySlug)
+    if (isMobile) {
+      setIsSidebarOpen(false)
+    }
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -163,10 +164,19 @@ function HomeContent() {
             </p>
           </div>
 
-          <ProductsGrid
-            category={category || selectedCategory}
-            limit={8}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Desktop Sidebar */}
+            {!isMobile && (
+              <div className="lg:col-span-1">
+                <CategoriesSidebar onCategorySelect={handleCategorySelect} />
+              </div>
+            )}
+
+            {/* Products Grid */}
+            <div className="lg:col-span-3">
+              <ProductsGrid category={category || undefined} />
+            </div>
+          </div>
 
           <div className="text-center mt-12">
             <Link href="/products">

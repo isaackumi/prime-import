@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { ProductsGrid } from '@/components/products/products-grid'
 import { CategoriesSidebar } from '@/components/categories/categories-sidebar'
 import { Input } from '@/components/ui/input'
@@ -9,12 +9,16 @@ import { Search } from 'lucide-react'
 import { trpc } from '@/lib/trpc/client'
 import { useSearchParams } from 'next/navigation'
 import { redirect } from 'next/navigation'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Filter, X } from 'lucide-react'
 
 export default function StorePage() {
     const [searchTerm, setSearchTerm] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('')
     const searchParams = useSearchParams()
     const category = searchParams.get('category')
+    const isMobile = useIsMobile()
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     // Get store slug from subdomain or URL
     const [storeSlug, setStoreSlug] = useState('')
@@ -35,7 +39,10 @@ export default function StorePage() {
     )
 
     const handleCategorySelect = (categorySlug: string) => {
-        setSelectedCategory(categorySlug)
+        // Category selection is handled by the sidebar component
+        if (isMobile) {
+            setIsSidebarOpen(false)
+        }
     }
 
     const handleSearch = (e: React.FormEvent) => {
@@ -146,7 +153,7 @@ export default function StorePage() {
                     {/* Products Grid */}
                     <ProductsGrid
                         storeSlug={storeSlug}
-                        category={category || selectedCategory}
+                        category={category || undefined}
                     />
                 </div>
             </div>
