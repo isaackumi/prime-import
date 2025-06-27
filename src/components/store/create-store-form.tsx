@@ -25,6 +25,7 @@ export function CreateStoreForm() {
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors },
         reset,
     } = useForm<CreateStoreForm>({
@@ -81,7 +82,7 @@ export function CreateStoreForm() {
                         </label>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/60 font-mono">
-                                evander.com/store/
+                                primeimport.com/store/
                             </span>
                             <Input
                                 id="slug"

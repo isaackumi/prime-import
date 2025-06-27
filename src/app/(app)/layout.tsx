@@ -11,28 +11,23 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Prime Importation",
-  description: "A modern multi-tenant e-commerce platform",
+  title: "Prime Importation - B2B & B2C Import/Export Solutions",
+  description: "Leading importation business providing B2B and B2C solutions. Connect global suppliers with businesses and consumers worldwide.",
+  keywords: "importation, B2B, B2C, global trade, suppliers, wholesale, retail, import export",
 };
 
-export default function RootLayout({
+export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${dmSans.className} antialiased`}
-      >
-        <TRPCProvider>
-          <CartProvider>
-            <Navbar />
-            {children}
-            <Toaster position="top-right" />
-          </CartProvider>
-        </TRPCProvider>
-      </body>
-    </html>
+    <TRPCProvider>
+      <CartProvider>
+        <Navbar />
+        {children}
+        <Toaster position="top-right" />
+      </CartProvider>
+    </TRPCProvider>
   );
 }

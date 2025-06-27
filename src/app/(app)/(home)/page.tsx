@@ -1,12 +1,10 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ProductsGrid } from '@/components/products/products-grid'
-import { CreateStoreForm } from '@/components/store/create-store-form'
 import { CategoriesSidebar } from '@/components/categories/categories-sidebar'
 import { Input } from '@/components/ui/input'
 import { Search, Filter, X } from 'lucide-react'
@@ -24,6 +22,46 @@ import {
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { useIsMobile } from '@/hooks/use-mobile'
+
+// Lazy load the ProductsGrid component
+const ProductsGrid = lazy(() => import('@/components/products/products-grid').then(module => ({ default: module.ProductsGrid })))
+
+// Lazy load the CreateStoreForm component
+const CreateStoreForm = lazy(() => import('@/components/store/create-store-form').then(module => ({ default: module.CreateStoreForm })))
+
+// Loading skeleton for ProductsGrid
+function ProductsGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="animate-pulse">
+          <div className="h-64 bg-gray-200 rounded-lg mb-4" />
+          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2" />
+          <div className="h-6 bg-gray-200 rounded w-1/4" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Loading skeleton for CreateStoreForm
+function CreateStoreFormSkeleton() {
+  return (
+    <div className="w-full max-w-md mx-auto animate-pulse">
+      <div className="h-16 bg-gray-200 rounded-t-lg mb-6" />
+      <div className="space-y-4">
+        <div className="h-4 bg-gray-200 rounded w-1/4" />
+        <div className="h-10 bg-gray-200 rounded" />
+        <div className="h-4 bg-gray-200 rounded w-1/3" />
+        <div className="h-10 bg-gray-200 rounded" />
+        <div className="h-4 bg-gray-200 rounded w-1/4" />
+        <div className="h-20 bg-gray-200 rounded" />
+        <div className="h-12 bg-gray-200 rounded" />
+      </div>
+    </div>
+  )
+}
 
 function HomeContent() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -52,17 +90,17 @@ function HomeContent() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <Badge className="mb-6 bg-yellow-400 text-black border-2 border-black font-bold text-sm px-4 py-2">
-              🚀 Multi-Vendor E-commerce Platform
+              🌍 Global Import/Export Solutions
             </Badge>
 
             <h1 className="text-5xl md:text-7xl font-bold text-black mb-6 leading-tight">
-              Build Your
-              <span className="block text-blue-600">Digital Empire</span>
+              Your Gateway to
+              <span className="block text-blue-600">Global Trade</span>
             </h1>
 
             <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Create your own store, sell products globally, and join thousands of successful merchants
-              in our thriving multi-tenant marketplace.
+              Prime Importation connects businesses and consumers with premium suppliers worldwide.
+              From B2B wholesale to B2C retail, we make global trade accessible and profitable.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -71,7 +109,7 @@ function HomeContent() {
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 text-lg border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 transform hover:translate-x-[4px] hover:translate-y-[4px]"
               >
                 <Store className="w-5 h-5 mr-2" />
-                Start Your Store
+                Start Importing
               </Button>
 
               <Button
@@ -80,7 +118,7 @@ function HomeContent() {
                 className="bg-white text-black font-bold py-4 px-8 text-lg border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 transform hover:translate-x-[4px] hover:translate-y-[4px]"
               >
                 <Globe className="w-5 h-5 mr-2" />
-                Browse Stores
+                Browse Products
               </Button>
             </div>
           </div>
@@ -136,7 +174,9 @@ function HomeContent() {
             </p>
           </div>
 
-          <ProductsGrid category={category || undefined} />
+          <Suspense fallback={<ProductsGridSkeleton />}>
+            <ProductsGrid category={category || undefined} />
+          </Suspense>
 
           <div className="text-center mt-12">
             <Link href="/products">
@@ -198,10 +238,10 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-black mb-4">
-              Why Choose Evander?
+              Why Choose Prime Importation?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Everything you need to build, grow, and scale your online business
+              Your trusted partner for global trade and import/export solutions
             </p>
           </div>
 
@@ -211,11 +251,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Store className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Multi-Tenant</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">B2B & B2C</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Each merchant gets their own branded store with complete customization options.
+                  Serve both business customers and individual consumers with flexible pricing and terms.
                 </p>
               </CardContent>
             </Card>
@@ -225,11 +265,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Secure Payments</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">Trade Compliance</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Stripe-powered payments with automatic payouts to all merchants.
+                  Full compliance with international trade regulations and customs requirements.
                 </p>
               </CardContent>
             </Card>
@@ -239,11 +279,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Lightning Fast</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">Fast Logistics</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Built with Next.js 15 and tRPC for optimal performance and developer experience.
+                  Efficient shipping and logistics solutions with real-time tracking worldwide.
                 </p>
               </CardContent>
             </Card>
@@ -253,11 +293,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Global Reach</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">Global Network</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Reach customers worldwide with our international shipping and payment options.
+                  Extensive network of verified suppliers and buyers across multiple continents.
                 </p>
               </CardContent>
             </Card>
@@ -267,11 +307,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Analytics</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">Market Insights</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Comprehensive analytics and insights to help you grow your business.
+                  Real-time market data and trends to help you make informed trading decisions.
                 </p>
               </CardContent>
             </Card>
@@ -281,11 +321,11 @@ function HomeContent() {
                 <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4">
                   <ShoppingBag className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-black">Inventory</CardTitle>
+                <CardTitle className="text-2xl font-bold text-black">Quality Control</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-700">
-                  Advanced inventory management with real-time stock tracking and alerts.
+                  Rigorous quality control processes to ensure product standards and customer satisfaction.
                 </p>
               </CardContent>
             </Card>
@@ -299,11 +339,11 @@ function HomeContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-black mb-6">
-                Ready to Start Selling?
+                Ready to Start Trading?
               </h2>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Join thousands of successful merchants who have built their businesses on Evander.
-                Set up your store in minutes and start selling to customers worldwide.
+                Join thousands of successful traders who have built their businesses on Prime Importation.
+                Connect with global suppliers and buyers, and start your import/export journey today.
               </p>
 
               <div className="space-y-4">
@@ -311,31 +351,33 @@ function HomeContent() {
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
-                  <span className="text-gray-700">No setup fees or monthly charges</span>
+                  <span className="text-gray-700">Verified supplier network</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
-                  <span className="text-gray-700">Instant Stripe integration</span>
+                  <span className="text-gray-700">Trade compliance support</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
-                  <span className="text-gray-700">Mobile-responsive design</span>
+                  <span className="text-gray-700">Secure payment processing</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
-                  <span className="text-gray-700">24/7 customer support</span>
+                  <span className="text-gray-700">24/7 trade support</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <CreateStoreForm />
+              <Suspense fallback={<CreateStoreFormSkeleton />}>
+                <CreateStoreForm />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -346,20 +388,20 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div className="border-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] bg-blue-600 p-8">
-              <div className="text-4xl font-bold mb-2">1,000+</div>
-              <div className="text-lg">Active Stores</div>
+              <div className="text-4xl font-bold mb-2">500+</div>
+              <div className="text-lg">Verified Suppliers</div>
             </div>
             <div className="border-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] bg-green-600 p-8">
-              <div className="text-4xl font-bold mb-2">50,000+</div>
-              <div className="text-lg">Products Sold</div>
+              <div className="text-4xl font-bold mb-2">10,000+</div>
+              <div className="text-lg">Products Traded</div>
             </div>
             <div className="border-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] bg-purple-600 p-8">
-              <div className="text-4xl font-bold mb-2">$2M+</div>
-              <div className="text-lg">Revenue Generated</div>
+              <div className="text-4xl font-bold mb-2">$50M+</div>
+              <div className="text-lg">Trade Volume</div>
             </div>
             <div className="border-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] bg-orange-600 p-8">
-              <div className="text-4xl font-bold mb-2">99.9%</div>
-              <div className="text-lg">Uptime</div>
+              <div className="text-4xl font-bold mb-2">25+</div>
+              <div className="text-lg">Countries Served</div>
             </div>
           </div>
         </div>
