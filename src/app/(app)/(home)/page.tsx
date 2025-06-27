@@ -153,6 +153,46 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* Store List Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-black mb-4">
+              Featured Stores
+            </h2>
+            <p className="text-xl text-gray-600">
+              Visit our featured stores and discover unique products
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: "Tech Gadgets Store", slug: "tech-gadgets", description: "Latest tech gadgets and electronics", color: "#2563eb" },
+              { name: "Fashion Boutique", slug: "fashion-boutique", description: "Trendy fashion items", color: "#ec4899" },
+              { name: "Home & Garden", slug: "home-garden", description: "Everything for your home", color: "#059669" },
+              { name: "Sports Equipment", slug: "sports-equipment", description: "Quality sports equipment", color: "#dc2626" }
+            ].map((store) => (
+              <Card key={store.slug} className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-300 transform hover:-translate-x-1 hover:-translate-y-1">
+                <CardHeader className="border-b-4 border-black" style={{ backgroundColor: `${store.color}20` }}>
+                  <CardTitle className="text-xl font-bold text-black">{store.name}</CardTitle>
+                  <CardDescription className="text-gray-700">{store.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <Link href={`/${store.slug}`}>
+                    <Button
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 transform hover:translate-x-[2px] hover:translate-y-[2px]"
+                    >
+                      Visit Store
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

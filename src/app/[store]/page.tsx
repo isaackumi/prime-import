@@ -32,16 +32,21 @@ export default function StorePage() {
         let slug = ''
         const subdomain = hostname.split('.')[0]
 
-        if (hostname.includes('.') && subdomain !== 'www' && subdomain !== 'localhost') {
+        // Check if this is a Vercel domain (contains vercel.app)
+        const isVercelDomain = hostname.includes('vercel.app')
+
+        if (hostname.includes('.') && subdomain !== 'www' && subdomain !== 'localhost' && !isVercelDomain) {
+            // Only use subdomain if it's not a Vercel domain
             slug = subdomain
         } else {
-            // If no subdomain, try to extract from pathname (for middleware rewrites)
+            // For Vercel domains or localhost, extract from pathname
             const pathSegments = pathname.split('/').filter(Boolean)
             if (pathSegments.length > 0) {
                 slug = pathSegments[0]
             }
         }
 
+        console.log('Store detection:', { hostname, pathname, subdomain, isVercelDomain, slug })
         setStoreSlug(slug)
     }, [])
 
@@ -89,6 +94,34 @@ export default function StorePage() {
                         <div className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-red-50 p-8 max-w-md mx-auto">
                             <h3 className="text-xl font-bold text-red-600 mb-2">Store Not Found</h3>
                             <p className="text-red-500 mb-4">The store you are looking for does not exist.</p>
+
+                            {/* Temporary debugging info */}
+                            <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded border mb-4">
+                                <p><strong>Debug Info:</strong></p>
+                                <p>Store Slug: {storeSlug || 'Not set'}</p>
+                                <p>Hostname: {typeof window !== 'undefined' ? window.location.hostname : 'N/A'}</p>
+                                <p>Pathname: {typeof window !== 'undefined' ? window.location.pathname : 'N/A'}</p>
+                                {error && (
+                                    <p className="text-red-500 mt-2">Error: {error.message}</p>
+                                )}
+                                <p className="mt-2">
+                                    <a
+                                        href="/api/seed"
+                                        target="_blank"
+                                        className="text-blue-600 hover:text-blue-800 underline"
+                                    >
+                                        Click here to seed the database
+                                    </a>
+                                </p>
+                                <p className="mt-2 text-xs">
+                                    <strong>Test URLs:</strong><br />
+                                    • /tech-gadgets<br />
+                                    • /fashion-boutique<br />
+                                    • /home-garden<br />
+                                    • /sports-equipment
+                                </p>
+                            </div>
+
                             <div className="mt-4">
                                 <a
                                     href="/"

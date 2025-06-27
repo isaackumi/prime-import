@@ -9,8 +9,18 @@ export function middleware(request: NextRequest) {
         return NextResponse.next()
     }
 
+    // Check if this is a Vercel domain
+    const isVercelDomain = host.includes('vercel.app')
+
     // Extract subdomain
     const subdomain = host.split('.')[0]
+
+    // For Vercel domains, we'll use path-based routing instead of subdomain routing
+    if (isVercelDomain) {
+        // If we're on a Vercel domain and the path doesn't start with a store slug,
+        // we'll let the app handle it normally
+        return NextResponse.next()
+    }
 
     // Check if this is a subdomain (not www, localhost, or main domain)
     if (host.includes('.') && subdomain !== 'www' && subdomain !== 'localhost') {
